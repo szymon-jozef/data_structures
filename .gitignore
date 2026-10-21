@@ -21,6 +21,7 @@ devenv.local.yaml
 # Precompiled Headers
 *.gch
 *.pch
+**/vgcore**
 
 # Linker files
 *.ilk
