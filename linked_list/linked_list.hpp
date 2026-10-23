@@ -1,9 +1,11 @@
 #include <cassert>
+#include <concepts>
 #include <cstddef>
 #include <optional>
 #include <sstream>
 #include <string>
-template <typename T> class Node {
+
+template <std::equality_comparable T> class Node {
   T data;
   Node *next;
   Node *prev;
@@ -53,7 +55,7 @@ public:
   // === Inserting ===
 
   /// Add new node at the end of the list.
-  /// This function allocates on the heap
+  /// This method allocates on the heap
   void push_back(T data) {
     if (!tail && !head) {
       init_list(data);
@@ -72,7 +74,7 @@ public:
   }
 
   /// Add new node at the beginning of the list.
-  /// This function allocates on the heap
+  /// This method allocates on the heap
   void push_front(T data) {
     if (!tail && !head) {
       init_list(data);
@@ -94,7 +96,7 @@ public:
   ///
   /// If `after` is not found in the list, it does nothing
   ///
-  /// This function allocates on the heap
+  /// This method allocates on the heap
   void insert_after(T data, T after) {
     const auto found_index = find(after);
     if (!found_index) {
@@ -112,14 +114,57 @@ public:
     after_found_node->set_prev(new_node);
   }
 
+  /// Push `data` into the list, ensuring sorted order.
+  /// **Shouldn't** be mixed with other pushing methods.
+  ///
+  /// This method allocates on the heap
   void push_sorted(T data) {
-    // TODO!();
+    if (!tail && !head) {
+      init_list(data);
+      return;
+    }
+
+    assert(head && tail);
+
+    if (data > tail->get_data()) {
+      this->push_back(data);
+      return;
+    }
+
+    if (data < head->get_data()) {
+      this->push_front(data);
+      return;
+    }
+
+    Node<T> *n = head;
+
+    do {
+      if (n->get_data() < data && data < n->get_next()->get_data()) {
+        Node<T> *before_node = n;
+        Node<T> *new_node = new Node(data);
+        Node<T> *after_node = n->get_next();
+
+        before_node->set_next(new_node);
+
+        new_node->set_prev(before_node);
+        new_node->set_next(after_node);
+
+        after_node->set_prev(new_node);
+
+        return;
+      }
+
+      if (n == tail) {
+        return;
+      }
+
+    } while ((n = n->get_next()));
   }
 
   // === Removing ===
 
   /// Remove the last element of the list
-  /// This function deallocates the last node
+  /// This method deallocates the last node
   ///
   /// @return Copy of data in the last node
   T pop_back() {
@@ -143,7 +188,7 @@ public:
   }
 
   /// Remove the first element of the list
-  /// This function deallocates the first node
+  /// This method deallocates the first node
   ///
   /// @return Copy of data in the first node
   T pop_front() {
@@ -167,7 +212,7 @@ public:
   }
 
   /// Remove the nth element of the list.
-  /// This function deallocates selected node
+  /// This method deallocates selected node
   ///
   /// @return Copy of data in the selected node
   T pop_nth(size_t index) {

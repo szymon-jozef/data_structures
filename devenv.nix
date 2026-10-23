@@ -10,7 +10,7 @@
   # https://devenv.sh/basics/
   env.GREET = "devenv";
 
-  packages = [ pkgs.git pkgs.valgrind];
+  packages = [ pkgs.git pkgs.valgrind pkgs.gdb];
 
   # https://devenv.sh/languages/
   languages.cplusplus.enable = true;
