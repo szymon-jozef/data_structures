@@ -2,7 +2,7 @@
 #include <print>
 
 void search_for_value_and_display(LinkedList<int> &l, int value) {
-  auto found_index = l.find(value);
+  auto found_index = l.find_index(value);
   std::println("Searching for value {} in the list...", value);
   if (found_index) {
     std::println("Found at index: {}", found_index.value());

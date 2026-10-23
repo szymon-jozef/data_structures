@@ -98,12 +98,12 @@ public:
   ///
   /// This method allocates on the heap
   void insert_after(T data, T after) {
-    const auto found_index = find(after);
-    if (!found_index) {
+    const auto result = find_pointer(after);
+    if (!result) {
       return;
     }
 
-    Node<T> *found_node = (*this)[found_index.value()];
+    Node<T> *found_node = result.value();
     Node<T> *after_found_node = found_node->get_next();
     Node<T> *new_node = new Node(data);
 
@@ -251,12 +251,26 @@ public:
 
   /// Find index of node with specified `data`
   /// If two nodes contains the same `data`, it will return the first occurrence
-  std::optional<size_t> find(T data) {
+  std::optional<size_t> find_index(T data) {
     Node<T> *n = head;
 
     for (size_t i = 0; i < size; i++) {
       if (n->get_data() == data) {
         return i;
+      }
+
+      n = n->get_next();
+    }
+
+    return std::nullopt;
+  }
+
+  std::optional<Node<T> *> find_pointer(T data) {
+    Node<T> *n = head;
+
+    for (size_t i = 0; i < size; i++) {
+      if (n->get_data() == data) {
+        return n;
       }
 
       n = n->get_next();
