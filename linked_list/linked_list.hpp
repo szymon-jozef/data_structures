@@ -112,6 +112,8 @@ public:
 
     found_node->set_next(new_node);
     after_found_node->set_prev(new_node);
+
+    size++;
   }
 
   /// Push `data` into the list, ensuring sorted order.
@@ -119,16 +121,19 @@ public:
   ///
   /// This method allocates on the heap
   void push_sorted(T data) {
+    // first element on the list
     if (!this->is_initialized()) {
       init_list(data);
       return;
     }
 
+    // smaller than the first node
     if (data > tail->get_data()) {
       this->push_back(data);
       return;
     }
 
+    // larger than the last element
     if (data < head->get_data()) {
       this->push_front(data);
       return;
@@ -136,6 +141,7 @@ public:
 
     Node<T> *n = head;
 
+    // between other data
     do {
       if (n->get_data() < data && data < n->get_next()->get_data()) {
         Node<T> *before_node = n;
@@ -149,10 +155,12 @@ public:
 
         after_node->set_prev(new_node);
 
+        size++;
+
         return;
       }
 
-      if (n == tail) {
+      if (n == tail) { // don't double check end
         return;
       }
 
@@ -214,7 +222,29 @@ public:
   ///
   /// @return Copy of data in the selected node
   T pop_nth(size_t index) {
-    // TODO!()
+    assert(("List is not initialized", is_initialized()));
+    assert(("List is empty", !is_empty()));
+    assert(("Index is out of bounds", index < size));
+
+    if (index == 0) {
+      return this->pop_front();
+    }
+
+    if (index == size - 1) {
+      return this->pop_back();
+    }
+
+    Node<T> *n = (*this)[index];
+    T data = n->get_data();
+
+    Node<T> *before = n->get_prev();
+    Node<T> *after = n->get_next();
+
+    before->set_next(after);
+    after->set_prev(before);
+
+    size--;
+    return data;
   }
 
   // === Traversing ===

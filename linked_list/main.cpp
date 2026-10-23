@@ -39,7 +39,8 @@ int main(void) {
     search_for_value_and_display(l, 67);
 
     std::println("Get 2nd element ptr");
-    auto element = l[1];
+    const int index = 1;
+    auto element = l[index];
     if (!element) {
       std::println("It is null");
     } else {
@@ -48,6 +49,9 @@ int main(void) {
       std::println("Change value of the 2nd element to 67");
       element->set_data(67);
       std::println("List after change: {}", l.to_string());
+      l.pop_nth(index);
+      std::println("List after poping this element by index: {}",
+                   l.to_string());
     }
   }
 
