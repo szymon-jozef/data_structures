@@ -24,6 +24,10 @@ int main(void) {
   l.push_back(3);
   std::println("List after pushing back: {}", l.to_string());
 
+  std::println("Insert 67 after 2");
+  l.insert_after(67, 2);
+  std::println("{}", l.to_string());
+
   std::println("Last element poped: {}", l.pop_back());
   std::println("{}", l.to_string());
 

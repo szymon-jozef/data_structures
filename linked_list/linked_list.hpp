@@ -91,7 +91,28 @@ public:
   }
 
   /// Insert `data` right after the first node containing `after` value
+  ///
+  /// If `after` is not found in the list, it does nothing
+  ///
+  /// This function allocates on the heap
   void insert_after(T data, T after) {
+    const auto found_index = find(after);
+    if (!found_index) {
+      return;
+    }
+
+    Node<T> *found_node = (*this)[found_index.value()];
+    Node<T> *after_found_node = found_node->get_next();
+    Node<T> *new_node = new Node(data);
+
+    new_node->set_prev(found_node);
+    new_node->set_next(after_found_node);
+
+    found_node->set_next(new_node);
+    after_found_node->set_prev(new_node);
+  }
+
+  void push_sorted(T data) {
     // TODO!();
   }
 
@@ -155,7 +176,7 @@ public:
 
   // === Traversing ===
 
-  /// Find index of node with specified `data
+  /// Find index of node with specified `data`
   /// If two nodes contains the same `data`, it will return the first occurrence
   std::optional<size_t> find(T data) {
     Node<T> *n = head;
