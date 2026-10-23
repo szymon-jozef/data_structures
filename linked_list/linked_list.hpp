@@ -57,12 +57,12 @@ public:
   /// Add new node at the end of the list.
   /// This method allocates on the heap
   void push_back(T data) {
-    if (!tail && !head) {
+    if (!this->is_initialized()) {
       init_list(data);
       return;
     }
 
-    assert(("Head or tail is a nullptr. This shouldn't happen", head && tail));
+    assert(("List is broken", !this->is_broken()));
 
     Node<T> *new_node = new Node(data);
 
@@ -76,12 +76,12 @@ public:
   /// Add new node at the beginning of the list.
   /// This method allocates on the heap
   void push_front(T data) {
-    if (!tail && !head) {
+    if (!this->is_initialized()) {
       init_list(data);
       return;
     }
 
-    assert(("Head or tail is a nullptr. This shouldn't happen", head && tail));
+    assert(("List is broken", !this->is_broken()));
 
     Node<T> *new_node = new Node(data);
     new_node->set_next(head);
@@ -119,12 +119,10 @@ public:
   ///
   /// This method allocates on the heap
   void push_sorted(T data) {
-    if (!tail && !head) {
+    if (!this->is_initialized()) {
       init_list(data);
       return;
     }
-
-    assert(head && tail);
 
     if (data > tail->get_data()) {
       this->push_back(data);
@@ -168,7 +166,7 @@ public:
   ///
   /// @return Copy of data in the last node
   T pop_back() {
-    assert(("Head and tail are nullptrs. This shouldn't happen", head && tail));
+    assert(("List is broken", !this->is_broken()));
 
     if (head == tail) {
       return pop_last_element();
@@ -192,7 +190,7 @@ public:
   ///
   /// @return Copy of data in the first node
   T pop_front() {
-    assert(("Head and tail are nullptrs. This shouldn't happen", head && tail));
+    assert(("List is broken", !this->is_broken()));
 
     if (head == tail) {
       return pop_last_element();
@@ -275,13 +273,11 @@ public:
 
   /// Deallocate the list
   void clear() {
-    if (!head && !tail) {
+    if (this->is_empty()) {
       return;
     }
 
-    assert(
-        ("List is initialized, but head or tail isn't set. The list is broken!",
-         head || tail));
+    assert(("List is broken", !this->is_broken()));
 
     size_t size = this->size;
     for (size_t i = 0; i < size; i++) {
@@ -313,4 +309,15 @@ public:
 
     return s.str();
   }
+
+  /// @return True if `size` is 0
+  bool is_empty() const { return size == 0; }
+
+  /// @return True if `head` and `tail` are both set
+  bool is_initialized() const { return head && tail; }
+
+  /// Check if the list is broken
+  /// @return True if `head` is valid and `tail` is a `nullptr` or `head` is a
+  /// `nullptr` and tail is valid
+  bool is_broken() const { return (head && !tail) || (!head && tail); }
 };
