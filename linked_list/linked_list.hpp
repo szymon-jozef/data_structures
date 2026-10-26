@@ -247,6 +247,10 @@ public:
     return data;
   }
 
+  bool pop_found(T data) {
+    // TODO!();
+  }
+
   // === Traversing ===
 
   /// Find index of node with specified `data`
