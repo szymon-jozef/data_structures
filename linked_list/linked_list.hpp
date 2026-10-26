@@ -248,7 +248,16 @@ public:
   }
 
   bool pop_found(T data) {
-    // TODO!();
+    Node<T> *found = this->find_pointer(data).value_or(nullptr);
+
+    if (!found) {
+      return false;
+    }
+
+    found->get_prev()->set_next(found->get_next());
+    delete found;
+    size--;
+    return true;
   }
 
   // === Traversing ===

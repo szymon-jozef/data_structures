@@ -16,10 +16,16 @@ int main(void) {
     LinkedList<int> l;
     std::println("Empty list: {}", l.to_string());
 
+    l.push_front(4);
+    l.push_front(5);
+    l.push_front(6);
     l.push_front(1);
     l.push_front(0);
     l.push_front(-1);
     std::println("List after pushing front: {}", l.to_string());
+
+    l.pop_found(5);
+    std::println("List after removing 5: {}", l.to_string());
 
     l.push_back(2);
     l.push_back(3);
