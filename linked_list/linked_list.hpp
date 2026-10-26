@@ -4,6 +4,7 @@
 #include <optional>
 #include <sstream>
 #include <string>
+#include <type_traits>
 
 template <std::equality_comparable T> class Node {
   T data;
@@ -254,7 +255,21 @@ public:
       return false;
     }
 
-    found->get_prev()->set_next(found->get_next());
+    Node<T> *before = found->get_prev();
+    Node<T> *after = found->get_next();
+    if (!before) {
+      pop_front();
+      return true;
+    }
+
+    if (!after) {
+      pop_back();
+      return true;
+    }
+
+    before->set_next(after);
+    after->set_prev(before);
+
     delete found;
     size--;
     return true;
@@ -354,7 +369,13 @@ public:
     Node<T> *n = head;
 
     do {
-      s << n->get_data();
+      T data = n->get_data();
+
+      if (std::is_pointer<T>::value) {
+        s << *data;
+      } else {
+        s << data;
+      }
 
       if (n->get_next()) {
         s << ',';
