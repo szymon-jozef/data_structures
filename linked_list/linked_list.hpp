@@ -104,6 +104,11 @@ public:
       return;
     }
 
+    if (result.value() == tail) {
+      push_back(data);
+      return;
+    }
+
     Node<T> *found_node = result.value();
     Node<T> *after_found_node = found_node->get_next();
     Node<T> *new_node = new Node(data);
@@ -144,7 +149,7 @@ public:
 
     // between other data
     do {
-      if (n->get_data() < data && data < n->get_next()->get_data()) {
+      if (n->get_data() <= data && data <= n->get_next()->get_data()) {
         Node<T> *before_node = n;
         Node<T> *new_node = new Node(data);
         Node<T> *after_node = n->get_next();
@@ -243,6 +248,8 @@ public:
 
     before->set_next(after);
     after->set_prev(before);
+
+    delete n;
 
     size--;
     return data;
@@ -371,7 +378,7 @@ public:
     do {
       T data = n->get_data();
 
-      if (std::is_pointer<T>::value) {
+      if constexpr (std::is_pointer<T>::value) {
         s << *data;
       } else {
         s << data;

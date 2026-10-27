@@ -13,79 +13,74 @@ void search_for_value_and_display(LinkedList<int> &l, int value) {
   }
 }
 
-int main(void) {
-  /*
-{ // not sorted
-  LinkedList<int> l;
-  std::println("Empty list: {}", l.to_string());
+void simple_test() {
+  { // not sorted
+    LinkedList<int> l;
+    std::println("Empty list: {}", l.to_string());
 
-  l.push_front(4);
-  l.push_front(5);
-  l.push_front(6);
-  l.push_front(1);
-  l.push_front(0);
-  l.push_front(-1);
-  std::println("List after pushing front: {}", l.to_string());
+    l.push_front(4);
+    l.push_front(5);
+    l.push_front(6);
+    l.push_front(1);
+    l.push_front(0);
+    l.push_front(-1);
+    std::println("List after pushing front: {}", l.to_string());
 
-  l.pop_found(5);
-  std::println("List after removing 5: {}", l.to_string());
+    l.pop_found(5);
+    std::println("List after removing 5: {}", l.to_string());
 
-  l.push_back(2);
-  l.push_back(3);
-  std::println("List after pushing back: {}", l.to_string());
+    l.push_back(2);
+    l.push_back(3);
+    std::println("List after pushing back: {}", l.to_string());
 
-  std::println("Insert 67 after 2");
-  l.insert_after(67, 2);
-  std::println("{}", l.to_string());
+    std::println("Insert 67 after 2");
+    l.insert_after(67, 2);
+    std::println("{}", l.to_string());
 
-  std::println("Last element poped: {}", l.pop_back());
-  std::println("{}", l.to_string());
+    std::println("Last element poped: {}", l.pop_back());
+    std::println("{}", l.to_string());
 
-  std::println("First element poped: {}", l.pop_front());
-  std::println("{}", l.to_string());
+    std::println("First element poped: {}", l.pop_front());
+    std::println("{}", l.to_string());
 
-  search_for_value_and_display(l, 0);
-  search_for_value_and_display(l, 67);
+    search_for_value_and_display(l, 0);
+    search_for_value_and_display(l, 67);
 
-  std::println("Get 2nd element ptr");
-  const int index = 1;
-  auto element = l[index];
-  if (!element) {
-    std::println("It is null");
-  } else {
-    std::println("2nd element exists and it's value is: {}",
-                 element->get_data());
-    std::println("Change value of the 2nd element to 67");
-    element->set_data(67);
-    std::println("List after change: {}", l.to_string());
-    l.pop_nth(index);
-    std::println("List after poping this element by index: {}",
-                 l.to_string());
+    std::println("Get 2nd element ptr");
+    const int index = 1;
+    auto element = l[index];
+    if (!element) {
+      std::println("It is null");
+    } else {
+      std::println("2nd element exists and it's value is: {}",
+                   element->get_data());
+      std::println("Change value of the 2nd element to 67");
+      element->set_data(67);
+      std::println("List after change: {}", l.to_string());
+      l.pop_nth(index);
+      std::println("List after poping this element by index: {}",
+                   l.to_string());
+    }
+  }
+
+  { // sorted
+    LinkedList<int> sorted_list;
+    sorted_list.push_sorted(-1);
+    sorted_list.push_sorted(-5);
+    sorted_list.push_sorted(-10);
+    sorted_list.push_sorted(50);
+    sorted_list.push_sorted(60);
+    sorted_list.push_sorted(10);
+    sorted_list.push_sorted(67);
+    sorted_list.push_sorted(-67);
+    std::println("Sorted list: {}", sorted_list.to_string());
   }
 }
 
-{ // sorted
-  LinkedList<int> sorted_list;
-  sorted_list.push_sorted(-1);
-  sorted_list.push_sorted(-5);
-  sorted_list.push_sorted(-10);
-  sorted_list.push_sorted(50);
-  sorted_list.push_sorted(60);
-  sorted_list.push_sorted(10);
-  sorted_list.push_sorted(67);
-  sorted_list.push_sorted(-67);
-  std::println("Sorted list: {}", sorted_list.to_string());
-}
-*/
-
+int main(void) {
   const int MAX_ORDER = 6;
   LinkedList<int> ll;
-  LinkedList<int *> lli;
-  int *test = new int(2);
-  lli.push_back(test);
-  std::println("{}", lli.to_string());
 
-  /*
   for (int o = 0; o <= MAX_ORDER; o++) {
     const int data_size = std::pow(10, o);
 
@@ -112,7 +107,6 @@ int main(void) {
     std::println("Avg remove time: {}", (t2 - t1) / data_size);
     ll.clear();
   }
-  */
 
   return 0;
 }
