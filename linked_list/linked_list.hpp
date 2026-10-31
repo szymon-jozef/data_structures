@@ -50,6 +50,14 @@ template <Comparable T> class LinkedList {
     return data;
   }
 
+  static const auto &unwrap(const T &data) {
+    if constexpr (std::is_pointer<T>::value) {
+      return *data;
+    } else {
+      return data;
+    }
+  }
+
 public:
   LinkedList() : head(nullptr), tail(nullptr), size(0) {}
   LinkedList(const LinkedList &) = delete;
@@ -354,7 +362,9 @@ public:
   size_t get_size() const { return size; }
 
   /// Deallocate the list
-  void clear() {
+  /// @param should_free_members If set to `true` and T is a pointer, it will
+  /// free the resources it holds
+  void clear(bool should_free_members = false) {
     if (this->is_empty()) {
       return;
     }
@@ -363,7 +373,12 @@ public:
 
     size_t size = this->size;
     for (size_t i = 0; i < size; i++) {
-      pop_front();
+      auto member = pop_front();
+      if constexpr (std::is_pointer<T>::value) {
+        if (should_free_members && member) {
+          delete member;
+        }
+      }
     }
   }
 
@@ -404,12 +419,4 @@ public:
   /// @return True if `head` is valid and `tail` is a `nullptr` or `head` is a
   /// `nullptr` and tail is valid
   bool is_broken() const { return (head && !tail) || (!head && tail); }
-
-  static const auto &unwrap(const T &data) {
-    if constexpr (std::is_pointer<T>::value) {
-      return *data;
-    } else {
-      return data;
-    }
-  }
 };

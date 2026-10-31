@@ -63,6 +63,15 @@ void simple_test() {
     }
   }
 
+  { // list of pointer
+    LinkedList<int *> pointer_list;
+    pointer_list.push_back(new int(1));
+    pointer_list.push_back(new int(2));
+    pointer_list.push_back(new int(3));
+    std::println("List of pointers: {}", pointer_list.to_string());
+    pointer_list.clear(true);
+  }
+
   { // sorted
     LinkedList<int> sorted_list;
     sorted_list.push_sorted(-1);
