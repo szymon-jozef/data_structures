@@ -2,14 +2,22 @@
 #include <concepts>
 #include <cstddef>
 #include <optional>
+#include <ostream>
 #include <sstream>
 #include <string>
 #include <type_traits>
 
 template <typename T>
+concept Printable = requires(std::ostream &os, const T &t) {
+  { os << t } -> std::same_as<std::ostream &>;
+};
+
+template <typename T>
 concept Comparable = std::totally_ordered<std::remove_pointer_t<T>>;
 
-template <Comparable T> class Node {
+template <typename T>
+  requires Comparable<T> && Printable<T>
+class Node {
   T data;
   Node *next;
   Node *prev;

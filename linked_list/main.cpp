@@ -1,6 +1,7 @@
 #include "linked_list.hpp"
+#include <chrono>
 #include <cmath>
-#include <ctime>
+#include <ostream>
 #include <print>
 
 void search_for_value_and_display(LinkedList<int> &l, int value) {
@@ -15,6 +16,7 @@ void search_for_value_and_display(LinkedList<int> &l, int value) {
 
 void simple_test() {
   { // not sorted
+    std::println("=== Basic operations on linked list ===");
     LinkedList<int> l;
     std::println("Empty list: {}", l.to_string());
 
@@ -64,6 +66,7 @@ void simple_test() {
   }
 
   { // list of pointer
+    std::println("=== List of pointers ===");
     LinkedList<int *> pointer_list;
     pointer_list.push_back(new int(1));
     pointer_list.push_back(new int(2));
@@ -73,6 +76,7 @@ void simple_test() {
   }
 
   { // sorted
+    std::println("=== Sorted list of int ===");
     LinkedList<int> sorted_list;
     sorted_list.push_sorted(-1);
     sorted_list.push_sorted(-5);
@@ -86,38 +90,64 @@ void simple_test() {
   }
 }
 
-int time_test() {
+struct TestStruct {
+  int field;
+
+  auto operator<=>(const TestStruct &t) const { return field <=> t.field; }
+  bool operator==(const TestStruct &t) const { return field == t.field; }
+
+  friend std::ostream &operator<<(std::ostream &os, const TestStruct &t) {
+    os << t.field;
+    return os;
+  }
+};
+
+void test_custom() {
+  std::println("=== Test struct ===");
+  LinkedList<TestStruct> ll;
+  ll.push_sorted(TestStruct{5});
+  ll.push_sorted(TestStruct{1});
+  ll.push_sorted(TestStruct{2});
+  ll.push_sorted(TestStruct{10});
+  std::println("Ordered list of tests structs: {}", ll.to_string());
+}
+
+void time_test() {
+  std::println("=== Time tests ===");
   const int MAX_ORDER = 6;
   LinkedList<int> ll;
 
   for (int o = 0; o <= MAX_ORDER; o++) {
-    const int data_size = std::pow(10, o);
+    const float data_size = std::pow(10, o);
 
-    clock_t t1 = clock();
+    auto t1 = std::chrono::high_resolution_clock::now();
 
     for (int i = 0; i < data_size; i++) {
-      ll.push_back(rand() % 101);
+      ll.push_back(rand() % 10001);
     }
 
-    clock_t t2 = clock();
+    auto t2 = std::chrono::high_resolution_clock::now();
+    auto duration = duration_cast<std::chrono::microseconds>(t2 - t1);
 
     std::println("List after pushing: {}", ll.to_string_summary());
-    std::println("Avg push time: {}", (t2 - t1) / data_size);
+    std::println("Duration: {}", duration);
+    std::println("Avg time: {}", duration / data_size);
 
     const int search_ammount = std::pow(10, 4);
-    t1 = clock();
+    t1 = std::chrono::high_resolution_clock::now();
+
     for (int i = 0; i < data_size; i++) {
       int random = rand() % 105;
       ll.pop_found(random);
     }
-    t2 = clock();
+    t2 = std::chrono::high_resolution_clock::now();
+    duration = duration_cast<std::chrono::microseconds>(t2 - t1);
 
     std::println("List after removing: {}", ll.to_string_summary());
-    std::println("Avg remove time: {}", (t2 - t1) / data_size);
+    std::println("Duration: {}", duration);
+    std::println("Avg remove time: {}", duration / data_size);
     ll.clear();
   }
-
-  return 0;
 }
 
-int main(void) { time_test(); }
+int main(void) { test_custom(); }
