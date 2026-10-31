@@ -8,3 +8,4 @@ set(CMAKE_CXX_FLAGS "-g")
 
 add_subdirectory(linked_list)
 add_subdirectory(dynamic_array)
+add_subdirectory(bst)
