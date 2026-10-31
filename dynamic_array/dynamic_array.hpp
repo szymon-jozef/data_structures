@@ -2,7 +2,7 @@
 #include <cstring>
 #include <sstream>
 
-template <typename T> class DynamicTable {
+template <typename T> class DynamicArray {
   size_t capacity = 8;
   size_t size;
   T *arr;
@@ -20,7 +20,7 @@ template <typename T> class DynamicTable {
   }
 
 public:
-  DynamicTable()
+  DynamicArray()
       : arr(new T[capacity]), capacity(8), size(0), multiplier(2.5) {}
 
   /// Add new element to the table

@@ -1,8 +1,8 @@
-#include "dynamic_table.hpp"
+#include "dynamic_array.hpp"
 #include <print>
 
 int main(void) {
-  DynamicTable<int> t;
+  DynamicArray<int> t;
   for (size_t i = 0; i < 1000; i++) {
     t.push_back(i);
   }
