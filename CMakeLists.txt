@@ -7,3 +7,4 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS True)
 set(CMAKE_CXX_FLAGS "-g")
 
 add_subdirectory(linked_list)
+add_subdirectory(dynamic_table)
