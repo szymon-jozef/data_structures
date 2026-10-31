@@ -101,7 +101,7 @@ int time_test() {
 
     clock_t t2 = clock();
 
-    std::println("List after pushing: {}", ll.to_string());
+    std::println("List after pushing: {}", ll.to_string_summary());
     std::println("Avg push time: {}", (t2 - t1) / data_size);
 
     const int search_ammount = std::pow(10, 4);
@@ -112,7 +112,7 @@ int time_test() {
     }
     t2 = clock();
 
-    std::println("List after removing: {}", ll.to_string());
+    std::println("List after removing: {}", ll.to_string_summary());
     std::println("Avg remove time: {}", (t2 - t1) / data_size);
     ll.clear();
   }
@@ -120,4 +120,4 @@ int time_test() {
   return 0;
 }
 
-int main(void) { simple_test(); }
+int main(void) { time_test(); }

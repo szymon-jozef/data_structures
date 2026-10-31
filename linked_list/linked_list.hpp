@@ -409,6 +409,47 @@ public:
     return s.str();
   }
 
+  /// @return String representation of list in short form.
+  const std::string to_string_summary() const {
+    if (size <= 6) {
+      return to_string();
+    }
+
+    std::stringstream s;
+    s << "Size: " << size;
+    s << " | ";
+
+    s << '[';
+
+    // first 3
+    auto n = head;
+    for (size_t i = 0; i < 3; i++) {
+      s << n->get_data();
+
+      if (i != 2) {
+        s << ',';
+      }
+
+      n = n->get_next();
+    }
+
+    s << ", ... ,";
+
+    // last 3
+    n = tail;
+    for (size_t i = 0; i < 3; i++) {
+      s << n->get_data();
+
+      if (i != 2) {
+        s << ',';
+      }
+      n = n->get_prev();
+    }
+    s << ']';
+
+    return s.str();
+  }
+
   /// @return True if `size` is 0
   bool is_empty() const { return size == 0; }
 
