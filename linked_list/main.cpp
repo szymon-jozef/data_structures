@@ -77,7 +77,7 @@ void simple_test() {
   }
 }
 
-int main(void) {
+int time_test() {
   const int MAX_ORDER = 6;
   LinkedList<int> ll;
 
@@ -110,3 +110,5 @@ int main(void) {
 
   return 0;
 }
+
+int main(void) { simple_test(); }

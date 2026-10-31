@@ -6,7 +6,10 @@
 #include <string>
 #include <type_traits>
 
-template <std::equality_comparable T> class Node {
+template <typename T>
+concept Comparable = std::totally_ordered<std::remove_pointer_t<T>>;
+
+template <Comparable T> class Node {
   T data;
   Node *next;
   Node *prev;
@@ -23,7 +26,7 @@ public:
   T get_data() const { return data; }
 };
 
-template <typename T> class LinkedList {
+template <Comparable T> class LinkedList {
   Node<T> *head;
   Node<T> *tail;
   size_t size;
@@ -132,15 +135,14 @@ public:
       init_list(data);
       return;
     }
-
     // smaller than the first node
-    if (data > tail->get_data()) {
+    if (unwrap(data) >= unwrap(tail->get_data())) {
       this->push_back(data);
       return;
     }
 
     // larger than the last element
-    if (data < head->get_data()) {
+    if (unwrap(data) <= unwrap(head->get_data())) {
       this->push_front(data);
       return;
     }
@@ -149,7 +151,8 @@ public:
 
     // between other data
     do {
-      if (n->get_data() <= data && data <= n->get_next()->get_data()) {
+      if (unwrap(n->get_data()) <= unwrap(data) &&
+          unwrap(data) <= unwrap(n->get_next()->get_data())) {
         Node<T> *before_node = n;
         Node<T> *new_node = new Node(data);
         Node<T> *after_node = n->get_next();
@@ -290,7 +293,7 @@ public:
     Node<T> *n = head;
 
     for (size_t i = 0; i < size; i++) {
-      if (n->get_data() == data) {
+      if (n->get_data() == unwrap(data)) {
         return i;
       }
 
@@ -304,7 +307,7 @@ public:
     Node<T> *n = head;
 
     for (size_t i = 0; i < size; i++) {
-      if (n->get_data() == data) {
+      if (n->get_data() == unwrap(data)) {
         return n;
       }
 
@@ -378,11 +381,7 @@ public:
     do {
       T data = n->get_data();
 
-      if constexpr (std::is_pointer<T>::value) {
-        s << *data;
-      } else {
-        s << data;
-      }
+      s << unwrap(data);
 
       if (n->get_next()) {
         s << ',';
@@ -405,4 +404,12 @@ public:
   /// @return True if `head` is valid and `tail` is a `nullptr` or `head` is a
   /// `nullptr` and tail is valid
   bool is_broken() const { return (head && !tail) || (!head && tail); }
+
+  static const auto &unwrap(const T &data) {
+    if constexpr (std::is_pointer<T>::value) {
+      return *data;
+    } else {
+      return data;
+    }
+  }
 };
