@@ -10,4 +10,5 @@ add_executable(bst main.cpp)
 target_link_libraries(bst
     PRIVATE
         bst_lib
+        custom_concepts
 )

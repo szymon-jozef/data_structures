@@ -10,4 +10,5 @@ add_executable(linked_list main.cpp)
 target_link_libraries(linked_list
     PRIVATE
         linked_list_lib
+        custom_concepts
 )

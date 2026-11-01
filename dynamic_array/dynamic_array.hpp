@@ -1,16 +1,8 @@
 #include <cassert>
-#include <concepts>
 #include <cstddef>
 #include <cstring>
+#include <custom_concepts.hpp>
 #include <sstream>
-
-template <typename T>
-concept Printable = requires(std::ostream &os, const T &t) {
-  { os << t } -> std::same_as<std::ostream &>;
-};
-
-template <typename T>
-concept Comparable = std::totally_ordered<std::remove_pointer_t<T>>;
 
 template <typename T>
   requires Comparable<T> && Printable<T>

@@ -10,4 +10,5 @@ add_executable(dynamic_array main.cpp)
 target_link_libraries(dynamic_array
     PRIVATE
         dynamic_array_lib
+        custom_concepts
 )
