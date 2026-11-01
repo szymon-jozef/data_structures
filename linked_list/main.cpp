@@ -102,7 +102,7 @@ struct TestStruct {
   }
 };
 
-void test_custom() {
+void test_custom_type() {
   std::println("=== Test struct ===");
   LinkedList<TestStruct> ll;
   ll.push_sorted(TestStruct{5});
@@ -112,42 +112,61 @@ void test_custom() {
   std::println("Ordered list of tests structs: {}", ll.to_string());
 }
 
+using fp_microseconds = std::chrono::duration<double, std::micro>;
+
+template <typename T>
+void test_pushing(LinkedList<T> &ll, const size_t data_size) {
+  std::println("\n=== Pushing ===");
+  auto const t1 = std::chrono::high_resolution_clock::now();
+
+  for (size_t i = 0; i < data_size; i++) {
+    ll.push_back(rand() % 10001);
+  }
+
+  auto const t2 = std::chrono::high_resolution_clock::now();
+  auto const duration = fp_microseconds(t2 - t1);
+
+  std::println("List after pushing: {}", ll.to_string_summary());
+  std::println("Duration: {}", duration);
+  std::println("Avg time: {}", duration / data_size);
+}
+
+template <typename T>
+void test_popping(LinkedList<T> &ll, const size_t search_amount) {
+  std::println("\n=== Popping ===");
+
+  auto const t1 = std::chrono::high_resolution_clock::now();
+
+  for (size_t i = 0; i < search_amount; i++) {
+    int random = rand() % 10001;
+    ll.pop_found(random);
+  }
+
+  auto const t2 = std::chrono::high_resolution_clock::now();
+  auto const duration = fp_microseconds(t2 - t1);
+
+  std::println("List after removing: {}", ll.to_string_summary());
+  std::println("Duration: {}", duration);
+  std::println("Avg remove time: {}", duration / search_amount);
+}
+
 void time_test() {
-  std::println("=== Time tests ===");
+  std::println("====== Time tests ======");
   const int MAX_ORDER = 6;
   LinkedList<int> ll;
+  srand(time(nullptr));
 
-  for (int o = 0; o <= MAX_ORDER; o++) {
-    const float data_size = std::pow(10, o);
+  for (int current_order = 1; current_order <= MAX_ORDER; current_order++) {
+    std::println("Current order: {}", current_order);
 
-    auto t1 = std::chrono::high_resolution_clock::now();
+    const size_t data_size = std::pow(10, current_order);
+    test_pushing<int>(ll, data_size);
 
-    for (int i = 0; i < data_size; i++) {
-      ll.push_back(rand() % 10001);
-    }
+    const size_t search_amount = std::pow(10, 4);
+    test_popping<int>(ll, search_amount);
 
-    auto t2 = std::chrono::high_resolution_clock::now();
-    auto duration = duration_cast<std::chrono::microseconds>(t2 - t1);
-
-    std::println("List after pushing: {}", ll.to_string_summary());
-    std::println("Duration: {}", duration);
-    std::println("Avg time: {}", duration / data_size);
-
-    const int search_ammount = std::pow(10, 4);
-    t1 = std::chrono::high_resolution_clock::now();
-
-    for (int i = 0; i < data_size; i++) {
-      int random = rand() % 105;
-      ll.pop_found(random);
-    }
-    t2 = std::chrono::high_resolution_clock::now();
-    duration = duration_cast<std::chrono::microseconds>(t2 - t1);
-
-    std::println("List after removing: {}", ll.to_string_summary());
-    std::println("Duration: {}", duration);
-    std::println("Avg remove time: {}", duration / data_size);
     ll.clear();
   }
 }
 
-int main(void) { test_custom(); }
+int main(void) { time_test(); }
