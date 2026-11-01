@@ -191,7 +191,8 @@ public:
   ///
   /// @return Copy of data in the last node
   T pop_back() {
-    assert(("List is broken", !this->is_broken()));
+    assert(("List is not initialized", is_initialized()));
+    assert(("List is empty", !is_empty()));
 
     if (head == tail) {
       return pop_last_element();
@@ -215,7 +216,8 @@ public:
   ///
   /// @return Copy of data in the first node
   T pop_front() {
-    assert(("List is broken", !this->is_broken()));
+    assert(("List is not initialized", is_initialized()));
+    assert(("List is empty", !is_empty()));
 
     if (head == tail) {
       return pop_last_element();
@@ -301,7 +303,7 @@ public:
     Node<T> *n = head;
 
     for (size_t i = 0; i < size; i++) {
-      if (n->get_data() == unwrap(data)) {
+      if (unwrap(n->get_data()) == unwrap(data)) {
         return i;
       }
 
@@ -315,7 +317,7 @@ public:
     Node<T> *n = head;
 
     for (size_t i = 0; i < size; i++) {
-      if (n->get_data() == unwrap(data)) {
+      if (unwrap(n->get_data()) == unwrap(data)) {
         return n;
       }
 
@@ -327,33 +329,43 @@ public:
 
   Node<T> *operator[](size_t index) {
     assert(("Index is out of bounds", index < size));
+    Node<T> *n = nullptr;
 
-    Node<T> *n = head;
-
-    for (size_t i = 0; i < size; i++) {
-      if (i == index) {
-        return n;
+    if (index <= size / 2) {
+      n = head;
+      for (size_t i = 0; i != index; i++) {
+        n = n->get_next();
       }
 
-      n = n->get_next();
+    } else if (index > size / 2) {
+      n = tail;
+      for (size_t i = size - 1; i != index; i--) {
+        n = n->get_prev();
+      }
     }
-
-    return nullptr;
+    return n;
   }
 
   const Node<T> *operator[](size_t index) const {
     assert(("Index is out of bounds", index < size));
 
-    Node<T> *n = head;
-
-    for (size_t i = 0; i < size; i++) {
-      if (i == index) {
-        return n;
+    if (index < size / 2) {
+      Node<T> *n = head;
+      for (size_t i = 0; i <= size; i++) {
+        if (i == index) {
+          return n;
+        }
+        n = n->get_next();
       }
-
-      n = n->get_next();
+    } else if (index >= size / 2) {
+      Node<T> *n = tail;
+      for (size_t i = size - 1; i > 0; i--) {
+        if (i == index) {
+          return n;
+        }
+        n = n->get_prev();
+      }
     }
-
     return nullptr;
   }
 
@@ -424,7 +436,7 @@ public:
     // first 3
     auto n = head;
     for (size_t i = 0; i < 3; i++) {
-      s << n->get_data();
+      s << unwrap(n->get_data());
 
       if (i != 2) {
         s << ',';
@@ -436,14 +448,14 @@ public:
     s << ", ... ,";
 
     // last 3
-    n = tail;
+    n = tail->get_prev()->get_prev();
     for (size_t i = 0; i < 3; i++) {
-      s << n->get_data();
+      s << unwrap(n->get_data());
 
       if (i != 2) {
         s << ',';
       }
-      n = n->get_prev();
+      n = n->get_next();
     }
     s << ']';
 
