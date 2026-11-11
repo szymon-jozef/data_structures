@@ -2,18 +2,19 @@
 
 template <typename T>
   requires Comparable<T> && Printable<T>
-struct Node {
-  T data;
-  Node *parent;
-  Node *left;
-  Node *right;
-
-  Node(T data) : data(data), left(nullptr), right(nullptr), parent(nullptr) {}
-};
-
-template <typename T>
-  requires Comparable<T> && Printable<T>
 class Bst {
+
+  template <typename Y>
+    requires Comparable<Y> && Printable<Y>
+  struct Node {
+    T data;
+    Node *parent;
+    Node *left;
+    Node *right;
+
+    Node(Y data) : data(data), left(nullptr), right(nullptr), parent(nullptr) {}
+  };
+
   Node<T> *root;
   size_t size;
 
@@ -52,6 +53,11 @@ class Bst {
 public:
   Bst() = default;
 
+  Bst(Bst &bst) = delete;
+  Bst operator=(Bst &bst) = delete;
+
+  ~Bst() { clear(); }
+
   /// @brief Insert data into binary search tree
   /// @return `true` on success, `false` otherwise
   bool insert(const T &data) {
@@ -81,5 +87,6 @@ public:
   size_t get_height() {}
 
   std::string to_string() {}
+
   std::string to_string_summary() {}
 };
