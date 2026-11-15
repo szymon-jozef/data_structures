@@ -1,6 +1,8 @@
 #include <bst.hpp>
 #include <print>
 
+using namespace bst;
+
 int main(void) {
   Bst<int> bst;
   bst.insert(1);
@@ -11,5 +13,8 @@ int main(void) {
   bst.insert(-10);
   bst.insert(100);
   bst.insert(200);
-  std::println("{}", bst.to_string());
+  std::println("Bst tree: ");
+  std::println("Inorder: \n{}", bst.to_string(TraverseOrder::Inorder));
+  std::println("Preorder: \n{}", bst.to_string(TraverseOrder::Preorder));
+  std::println("Postorder: \n{}", bst.to_string(TraverseOrder::Postorder));
 }

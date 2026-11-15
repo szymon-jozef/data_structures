@@ -1,6 +1,10 @@
 #include <custom_concepts.hpp>
 #include <sstream>
 
+namespace bst {
+
+enum class TraverseOrder { Inorder, Preorder, Postorder };
+
 template <typename T>
   requires Comparable<T> && Printable<T>
 class Bst {
@@ -15,7 +19,7 @@ class Bst {
     size_t index;
 
     Node(Y data, size_t index)
-        : data(data), parent(nullptr), right(nullptr), left(nullptr),
+        : data(data), parent(nullptr), left(nullptr), right(nullptr),
           index(index) {}
   };
 
@@ -57,18 +61,43 @@ class Bst {
     return false;
   }
 
-  void to_string_helper(Node<T> *node, std::stringstream &s) {
-    if (!node) {
-      s << 'N';
-      return;
-    }
+  void to_string_helper(Node<T> *node, std::stringstream &s,
+                        const TraverseOrder &order) {
+    switch (order) {
+    case TraverseOrder::Preorder:
+      if (!node) {
+        s << 'N';
+        return;
+      }
 
-    s << node->data << '{' << node->index << '}';
-    s << '(';
-    to_string_helper(node->left, s);
-    s << ',';
-    to_string_helper(node->right, s);
-    s << ')';
+      s << node->data << '{' << node->index << '}';
+      s << '(';
+      to_string_helper(node->left, s, order);
+      s << ',';
+      to_string_helper(node->right, s, order);
+      s << ')';
+      break;
+    case TraverseOrder::Inorder:
+      if (!node) {
+        return;
+      }
+
+      to_string_helper(node->left, s, order);
+      s << node->data << '{' << node->index << '}';
+      s << ',';
+      to_string_helper(node->right, s, order);
+      break;
+    case TraverseOrder::Postorder:
+      if (!node) {
+        return;
+      }
+
+      to_string_helper(node->left, s, order);
+      to_string_helper(node->right, s, order);
+      s << node->data << '{' << node->index << '}';
+      s << ',';
+      break;
+    }
   }
 
 public:
@@ -112,10 +141,10 @@ public:
     return -1;
   }
 
-  std::string to_string() {
+  std::string to_string(const TraverseOrder &traverse_order) {
     std::stringstream s;
     s << '[';
-    to_string_helper(root, s);
+    to_string_helper(root, s, traverse_order);
     s << ']';
     return s.str();
   }
@@ -125,3 +154,4 @@ public:
     return "s";
   }
 };
+} // namespace bst
