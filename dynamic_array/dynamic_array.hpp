@@ -13,7 +13,7 @@ class DynamicArray {
   size_t size;
   T *arr;
 
-  const float MULTIPLIER = 1.5;
+  const float MULTIPLIER = 2;
 
   /// @brief Allocate new array with current `capacity`, copy data from `arr` to
   /// it and set the new array to `arr`
@@ -28,7 +28,7 @@ class DynamicArray {
     arr = new_arr;
   }
 
-  static const auto &unwrap(T &data) {
+  static const auto &unwrap(const T &data) {
     if constexpr (std::is_pointer_v<T>) {
       return *data;
     } else {
@@ -37,7 +37,7 @@ class DynamicArray {
   }
 
 public:
-  DynamicArray() : arr(new T[capacity]), size(0) {}
+  DynamicArray() : size(0), arr(new T[capacity]) {}
 
   DynamicArray(const DynamicArray &) = delete;
   DynamicArray &operator=(const DynamicArray &) = delete;
@@ -66,7 +66,7 @@ public:
   /// to risk to many reallocations
   void reserve(size_t amount) {
     assert(amount > capacity &&
-           "New capacity cannot be smaller than current size");
+           "New capacity cannot be smaller than current one");
 
     capacity = amount;
     realloc();
@@ -83,7 +83,7 @@ public:
   }
 
   /// @brief String representation of the array
-  std::string as_string() {
+  std::string as_string() const {
     std::stringstream s;
     s << '[';
 
@@ -100,7 +100,7 @@ public:
   }
 
   /// @brief String representation of the array in shortened form
-  std::string as_string_summary() {
+  std::string as_string_summary() const {
     std::stringstream s;
     s << '{';
     s << "Size: " << size << ", Capacity: " << capacity;

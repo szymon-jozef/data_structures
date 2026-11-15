@@ -15,6 +15,7 @@
     pkgs.valgrind
     pkgs.gdb
     pkgs.cgdb
+    pkgs.cppcheck
   ];
 
   # https://devenv.sh/languages/

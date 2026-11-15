@@ -87,12 +87,13 @@ void sort_test() {
 }
 
 void time_test() {
+  srand(time(nullptr));
   std::println("=== Time test ===");
 
   DynamicArray<int> arr;
 
   const int ORDER = 7;
-  const int DATA_SIZE = pow(10, ORDER);
+  const size_t DATA_SIZE = pow(10, ORDER);
 
   const auto T1 = std::chrono::high_resolution_clock::now();
 
@@ -107,12 +108,13 @@ void time_test() {
     const auto TIME_PER_ELEMENT = fp_microseconds(T2_ELEMENT - T1_ELEMENT);
 
     if (TIME_PER_ELEMENT > max_time_per_element) {
-      std::println("New max time per element: {}", TIME_PER_ELEMENT);
+      std::println("New max time per element: {} with index: {}",
+                   TIME_PER_ELEMENT, i);
       max_time_per_element = TIME_PER_ELEMENT;
     }
 
     if (IS_REALLOC) {
-      std::println("Reallocation on element: {}!", i);
+      std::println("Reallocation on element: {}", i);
     }
   }
 
