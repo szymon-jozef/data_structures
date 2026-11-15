@@ -12,12 +12,16 @@ class Bst {
     Node *parent;
     Node *left;
     Node *right;
+    size_t index;
 
-    Node(Y data) : data(data), left(nullptr), right(nullptr), parent(nullptr) {}
+    Node(Y data, size_t index)
+        : data(data), parent(nullptr), right(nullptr), left(nullptr),
+          index(index) {}
   };
 
   Node<T> *root;
   size_t size;
+  size_t current_node_index = 0;
 
   bool insert_helper(Node<T> *node, const T &data) {
     T node_data = node->data;
@@ -31,7 +35,7 @@ class Bst {
         return insert_helper(node->left, data);
       }
 
-      Node<T> *new_node = new Node(data);
+      Node<T> *new_node = new Node(data, current_node_index++);
       new_node->parent = node;
       node->left = new_node;
       size++;
@@ -43,7 +47,7 @@ class Bst {
         return insert_helper(node->right, data);
       }
 
-      Node<T> *new_node = new Node(data);
+      Node<T> *new_node = new Node(data, current_node_index++);
       new_node->parent = node;
       node->right = new_node;
       size++;
@@ -59,7 +63,7 @@ class Bst {
       return;
     }
 
-    s << node->data;
+    s << node->data << '{' << node->index << '}';
     s << '(';
     to_string_helper(node->left, s);
     s << ',';
@@ -81,7 +85,7 @@ public:
   /// @return `true` on success, `false` if `data` is a duplicate
   bool insert(const T data) {
     if (is_empty()) {
-      Node<T> *new_node = new Node(data);
+      Node<T> *new_node = new Node(data, current_node_index++);
       root = new_node;
       size++;
       return true;
