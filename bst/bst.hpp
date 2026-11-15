@@ -1,4 +1,5 @@
 #include <custom_concepts.hpp>
+#include <sstream>
 
 template <typename T>
   requires Comparable<T> && Printable<T>
@@ -18,36 +19,52 @@ class Bst {
   Node<T> *root;
   size_t size;
 
-  bool insert_helper(Node<T> *root, const T &data) {
-    T root_data = root->data;
+  bool insert_helper(Node<T> *node, const T &data) {
+    T node_data = node->data;
 
-    if (root_data == data) {
+    if (node_data == data) {
       return false;
     }
 
-    if (data < root_data) {
-      if (root->left) {
-        return insert_helper(root->left, data);
-      } else {
-        Node<T> *new_node = new Node(data);
-        new_node->parent = root;
-        root->left = new_node;
-        size++;
-        return true;
+    if (data < node_data) {
+      if (node->left) {
+        return insert_helper(node->left, data);
       }
+
+      Node<T> *new_node = new Node(data);
+      new_node->parent = node;
+      node->left = new_node;
+      size++;
+      return true;
     }
 
-    if (data > root_data) {
-      if (root->right) {
-        return insert_helper(root->right, data);
-      } else {
-        Node<T> *new_node = new Node(data);
-        new_node->parent = root;
-        root->right = new_node;
-        size++;
-        return true;
+    if (data > node_data) {
+      if (node->right) {
+        return insert_helper(node->right, data);
       }
+
+      Node<T> *new_node = new Node(data);
+      new_node->parent = node;
+      node->right = new_node;
+      size++;
+      return true;
     }
+
+    return false;
+  }
+
+  void to_string_helper(Node<T> *node, std::stringstream &s) {
+    if (!node) {
+      s << 'N';
+      return;
+    }
+
+    s << node->data;
+    s << '(';
+    to_string_helper(node->left, s);
+    s << ',';
+    to_string_helper(node->right, s);
+    s << ')';
   }
 
 public:
@@ -56,11 +73,13 @@ public:
   Bst(Bst &bst) = delete;
   Bst operator=(Bst &bst) = delete;
 
+  /*
   ~Bst() { clear(); }
+  */
 
   /// @brief Insert data into binary search tree
-  /// @return `true` on success, `false` otherwise
-  bool insert(const T &data) {
+  /// @return `true` on success, `false` if `data` is a duplicate
+  bool insert(const T data) {
     if (is_empty()) {
       Node<T> *new_node = new Node(data);
       root = new_node;
@@ -81,12 +100,24 @@ public:
   /// @brief Remove every node from the tree
   void clear() {}
 
-  bool is_empty() { return root; }
+  bool is_empty() { return !root; }
 
   /// @brief Return the tree height
-  size_t get_height() {}
+  size_t get_height() {
+    // TODO!
+    return -1;
+  }
 
-  std::string to_string() {}
+  std::string to_string() {
+    std::stringstream s;
+    s << '[';
+    to_string_helper(root, s);
+    s << ']';
+    return s.str();
+  }
 
-  std::string to_string_summary() {}
+  std::string to_string_summary() {
+    // TODO!
+    return "s";
+  }
 };
