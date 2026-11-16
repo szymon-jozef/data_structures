@@ -1,5 +1,6 @@
 #include <bst.hpp>
 #include <print>
+#include <sstream>
 
 using namespace bst;
 
@@ -17,4 +18,12 @@ int main(void) {
   std::println("Inorder: \n{}", bst.to_string(TraverseOrder::Inorder));
   std::println("Preorder: \n{}", bst.to_string(TraverseOrder::Preorder));
   std::println("Postorder: \n{}", bst.to_string(TraverseOrder::Postorder));
+  const auto found = bst.search(3);
+  if (found) {
+    std::stringstream s;
+    s << *found;
+    std::println("Search for node with value 3 and found: {}", s.str());
+  } else {
+    std::println("Value 3 not found in the bst!");
+  }
 }

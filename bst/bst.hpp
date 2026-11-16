@@ -1,4 +1,5 @@
 #include <custom_concepts.hpp>
+#include <ostream>
 #include <sstream>
 
 namespace bst {
@@ -21,6 +22,15 @@ class Bst {
     Node(Y data, size_t index)
         : data(data), parent(nullptr), left(nullptr), right(nullptr),
           index(index) {}
+
+    friend std::ostream &operator<<(std::ostream &os, const Node &n) {
+      os << '[' << n.data << "{" << n.index << "}"
+         << "| Parent: " << (n.parent ? "Y" : "N")
+         << "| Left: " << (n.left ? "Y" : "N")
+         << "| Right: " << (n.right ? "Y" : "N") << ']';
+
+      return os;
+    }
   };
 
   Node<T> *root;
@@ -100,6 +110,24 @@ class Bst {
     }
   }
 
+  Node<T> *search_helper(Node<T> *node, const T &data) const {
+    if (!node) {
+      return nullptr;
+    }
+
+    if (node->data == data) {
+      return node;
+    }
+
+    if (node->data < data) {
+      return search_helper(node->right, data);
+    }
+
+    if (node->data > data) {
+      return search_helper(node->left, data);
+    }
+  }
+
 public:
   Bst() = default;
 
@@ -125,7 +153,7 @@ public:
 
   /// @brief Search for a node with `data`
   /// @return Pointer to node containing `data`
-  Node<T> *search(T data) {}
+  Node<T> *search(const T &data) const { return search_helper(root, data); }
 
   /// @brief Remove given node
   void remove(Node<T> *node) {}
