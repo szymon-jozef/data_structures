@@ -25,7 +25,16 @@ class Bst {
 
   Node<T> *root;
   size_t size;
+  size_t height;
   size_t current_node_index = 0;
+
+  size_t count_height(Node<T> *node) {
+    size_t new_height = 0;
+    while ((node = node->parent) != nullptr) {
+      new_height++;
+    }
+    return new_height;
+  }
 
   bool insert_helper(Node<T> *node, const T &data) {
     T node_data = node->data;
@@ -43,6 +52,10 @@ class Bst {
       new_node->parent = node;
       node->left = new_node;
       size++;
+      size_t new_height = count_height(new_node);
+      if (new_height > height) {
+        height = new_height;
+      }
       return true;
     }
 
@@ -55,6 +68,10 @@ class Bst {
       new_node->parent = node;
       node->right = new_node;
       size++;
+      size_t new_height = count_height(new_node);
+      if (new_height > height) {
+        height = new_height;
+      }
       return true;
     }
 
@@ -117,6 +134,7 @@ public:
       Node<T> *new_node = new Node(data, current_node_index++);
       root = new_node;
       size++;
+      height = 0;
       return true;
     }
 
@@ -128,18 +146,19 @@ public:
   Node<T> *search(T data) {}
 
   /// @brief Remove given node
-  void remove(Node<T> *node) {}
+  void remove(Node<T> *node) {
+    // TODO!
+  }
 
   /// @brief Remove every node from the tree
-  void clear() {}
+  void clear() {
+    // TODO!
+  }
 
   bool is_empty() { return !root; }
 
   /// @brief Return the tree height
-  size_t get_height() {
-    // TODO!
-    return -1;
-  }
+  size_t get_height() { return height; }
 
   std::string to_string(const TraverseOrder &traverse_order) {
     std::stringstream s;

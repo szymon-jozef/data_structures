@@ -17,4 +17,5 @@ int main(void) {
   std::println("Inorder: \n{}", bst.to_string(TraverseOrder::Inorder));
   std::println("Preorder: \n{}", bst.to_string(TraverseOrder::Preorder));
   std::println("Postorder: \n{}", bst.to_string(TraverseOrder::Postorder));
+  std::println("Tree height: {}", bst.get_height());
 }
