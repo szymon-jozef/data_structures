@@ -26,4 +26,5 @@ int main(void) {
   } else {
     std::println("Value 3 not found in the bst!");
   }
+  std::println("Tree height: {}", bst.get_height());
 }

@@ -11,7 +11,6 @@
   env.GREET = "devenv";
 
   packages = [
-    pkgs.git
     pkgs.valgrind
     pkgs.gdb
     pkgs.cgdb
