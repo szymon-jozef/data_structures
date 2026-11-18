@@ -143,6 +143,39 @@ class Bst {
     if (node->data > data) {
       return search_helper(node->left, data);
     }
+
+    return nullptr;
+  }
+
+  /// @brief Replaces one subtree as a child of its parent with another subtree
+  void transplant(Node<T> *to_replace, Node<T> *replacement) {
+    if (to_replace == root) {
+      root = replacement;
+    } else if (to_replace == to_replace->parent->left) {
+      to_replace->parent->left = replacement;
+    } else if (to_replace == to_replace->parent->right) {
+      to_replace->parent->right = replacement;
+    }
+
+    if (replacement != nullptr) {
+      replacement->parent = to_replace->parent;
+    }
+  }
+
+  static Node<T> *find_minimum(Node<T> *root) {
+    if (root->left == nullptr) {
+      return root;
+    } else {
+      return find_minimum(root->left);
+    }
+  }
+
+  static Node<T> *find_maximum(Node<T> *root) {
+    if (root->right == nullptr) {
+      return root;
+    } else {
+      return find_maximum(root->right);
+    }
   }
 
 public:
@@ -151,9 +184,7 @@ public:
   Bst(Bst &bst) = delete;
   Bst operator=(Bst &bst) = delete;
 
-  /*
   ~Bst() { clear(); }
-  */
 
   /// @brief Insert data into binary search tree
   /// @return `true` on success, `false` if `data` is a duplicate
@@ -175,18 +206,51 @@ public:
 
   /// @brief Remove given node
   void remove(Node<T> *node) {
-    // TODO!
+    if (!node) { // nothing to remove
+      return;
+    }
+
+    // first case -> node has only right child
+    if (node->left == nullptr) {
+      transplant(node, node->right);
+      delete node;
+      size--;
+      return;
+    } else if (node->right ==
+               nullptr) { // second case -> node has only left child
+      transplant(node, node->left);
+      delete node;
+      size--;
+      return;
+    } else { // third case -> node has two children
+      Node<T> *min = find_minimum(node->right);
+      if (min->parent != node) {
+        transplant(min, min->right);
+        min->right = node->right;
+        min->right->parent = min;
+      }
+
+      transplant(node, min);
+      min->left = node->left;
+      min->left->parent = min;
+      delete node;
+      size--;
+    }
   }
 
   /// @brief Remove every node from the tree
   void clear() {
-    // TODO!
+    while (root) {
+      remove(root);
+    }
   }
 
   bool is_empty() { return !root; }
 
   /// @brief Return the tree height
   size_t get_height() { return height; }
+  /// @brief Return the tree size (amount of nodes)
+  size_t get_size() { return size; }
 
   std::string to_string(const TraverseOrder &traverse_order) {
     std::stringstream s;
@@ -196,9 +260,18 @@ public:
     return s.str();
   }
 
+  const T &get_max() const { return find_maximum(root)->data; }
+  const T &get_min() const { return find_minimum(root)->data; }
+
   std::string to_string_summary() {
-    // TODO!
-    return "s";
+    std::stringstream s;
+    s << '[';
+    s << "Size: " << size << " | ";
+    s << "Height: " << height << " | ";
+    s << "Max value: " << get_max() << " | ";
+    s << "Min value: " << get_min();
+    s << ']';
+    return s.str();
   }
 };
 } // namespace bst
