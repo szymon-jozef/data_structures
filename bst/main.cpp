@@ -19,6 +19,28 @@ template <typename T> void test_remove_value(Bst<T> &bst, const T &value) {
                bst.to_string(TraverseOrder::Inorder));
 }
 
+struct TestStruct {
+  int number;
+  char super_character;
+
+  TestStruct(int number, char character)
+      : number(number), super_character(character) {}
+
+  TestStruct() : number(0), super_character('0') {};
+
+  auto operator<=>(const TestStruct &rhs) const {
+    return number <=> rhs.number;
+  }
+
+  bool operator==(const TestStruct &rhs) const { return number == rhs.number; }
+
+  friend std::ostream &operator<<(std::ostream &os, const TestStruct &t) {
+    os << "{ number = " << t.number << ", character = " << t.super_character
+       << "}";
+    return os;
+  }
+};
+
 int main(void) {
   Bst<int> bst;
   bst.insert(1);
@@ -64,4 +86,20 @@ int main(void) {
 
   test_remove_value<int>(bst, -10);
   std::println("Tree summary: {}", bst.to_string_summary());
+
+  std::println("=== Test struct ===");
+  Bst<TestStruct> bst_struct;
+  bst_struct.insert(TestStruct(2, 'c'));
+  bst_struct.insert(TestStruct(5, 'a'));
+  bst_struct.insert(TestStruct(-1, 'd'));
+  std::println("Test struct bst: {}",
+               bst_struct.to_string(TraverseOrder::Inorder));
+
+  std::println("=== Ptr struct ===");
+  Bst<int *> bst_ptr;
+  bst_ptr.insert(new int(2));
+  bst_ptr.insert(new int(4));
+  bst_ptr.insert(new int(1));
+  std::println("Bst of ptr to int: {}",
+               bst_ptr.to_string(TraverseOrder::Inorder));
 }

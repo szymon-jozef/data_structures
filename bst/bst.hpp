@@ -40,6 +40,14 @@ class Bst {
   size_t height = 0;
   size_t current_node_index = 0;
 
+  static const auto &unwrap(const T &data) {
+    if constexpr (std::is_pointer_v<T>) {
+      return *data;
+    } else {
+      return data;
+    }
+  }
+
   size_t count_height_helper(Node<T> *node, size_t current_height) {
     if (!node)
       return 0;
@@ -101,7 +109,7 @@ class Bst {
         return;
       }
 
-      s << node->data << '{' << node->index << '}';
+      s << unwrap(node->data) << '{' << node->index << '}';
       s << '(';
       to_string_helper(node->left, s, order);
       s << ',';
@@ -114,7 +122,7 @@ class Bst {
       }
 
       to_string_helper(node->left, s, order);
-      s << node->data << '{' << node->index << '}';
+      s << unwrap(node->data) << '{' << node->index << '}';
       s << ',';
       to_string_helper(node->right, s, order);
       break;
@@ -125,7 +133,7 @@ class Bst {
 
       to_string_helper(node->left, s, order);
       to_string_helper(node->right, s, order);
-      s << node->data << '{' << node->index << '}';
+      s << unwrap(node->data) << '{' << node->index << '}';
       s << ',';
       break;
     }
