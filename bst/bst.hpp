@@ -1,4 +1,6 @@
+#include <algorithm>
 #include <custom_concepts.hpp>
+#include <optional>
 #include <ostream>
 #include <sstream>
 
@@ -33,17 +35,25 @@ class Bst {
     }
   };
 
-  Node<T> *root;
-  size_t size;
-  size_t height;
+  Node<T> *root = nullptr;
+  size_t size = 0;
+  size_t height = 0;
   size_t current_node_index = 0;
 
-  size_t count_height(Node<T> *node) {
-    size_t new_height = 0;
-    while ((node = node->parent) != nullptr) {
-      new_height++;
-    }
-    return new_height;
+  size_t count_height_helper(Node<T> *node, size_t current_height) {
+    if (!node)
+      return 0;
+
+    const size_t h_left = count_height_helper(node->left, current_height + 1);
+    const size_t h_right = count_height_helper(node->right, current_height + 1);
+    return std::max(std::max(h_left, h_right), current_height);
+  }
+
+  size_t count_height() {
+    if (!root)
+      return 0;
+
+    return count_height_helper(root, 0);
   }
 
   bool insert_helper(Node<T> *node, const T &data) {
@@ -62,10 +72,7 @@ class Bst {
       new_node->parent = node;
       node->left = new_node;
       size++;
-      size_t new_height = count_height(new_node);
-      if (new_height > height) {
-        height = new_height;
-      }
+      height = count_height();
       return true;
     }
 
@@ -78,10 +85,7 @@ class Bst {
       new_node->parent = node;
       node->right = new_node;
       size++;
-      size_t new_height = count_height(new_node);
-      if (new_height > height) {
-        height = new_height;
-      }
+      height = count_height();
       return true;
     }
 
@@ -181,14 +185,14 @@ class Bst {
 public:
   Bst() = default;
 
-  Bst(Bst &bst) = delete;
-  Bst operator=(Bst &bst) = delete;
+  Bst(const Bst &bst) = delete;
+  Bst operator=(const Bst &bst) = delete;
 
   ~Bst() { clear(); }
 
   /// @brief Insert data into binary search tree
   /// @return `true` on success, `false` if `data` is a duplicate
-  bool insert(const T data) {
+  bool insert(const T &data) {
     if (is_empty()) {
       Node<T> *new_node = new Node(data, current_node_index++);
       root = new_node;
@@ -214,12 +218,14 @@ public:
     if (node->left == nullptr) {
       transplant(node, node->right);
       delete node;
+      height = count_height();
       size--;
       return;
     } else if (node->right ==
                nullptr) { // second case -> node has only left child
       transplant(node, node->left);
       delete node;
+      height = count_height();
       size--;
       return;
     } else { // third case -> node has two children
@@ -234,6 +240,7 @@ public:
       min->left = node->left;
       min->left->parent = min;
       delete node;
+      height = count_height();
       size--;
     }
   }
@@ -248,9 +255,9 @@ public:
   bool is_empty() { return !root; }
 
   /// @brief Return the tree height
-  size_t get_height() { return height; }
+  size_t get_height() const { return height; }
   /// @brief Return the tree size (amount of nodes)
-  size_t get_size() { return size; }
+  size_t get_size() const { return size; }
 
   std::string to_string(const TraverseOrder &traverse_order) {
     std::stringstream s;
@@ -260,16 +267,25 @@ public:
     return s.str();
   }
 
-  const T &get_max() const { return find_maximum(root)->data; }
-  const T &get_min() const { return find_minimum(root)->data; }
+  const std::optional<T> get_max() const {
+    if (root)
+      return find_maximum(root)->data;
+    else
+      return std::nullopt;
+  }
 
-  std::string to_string_summary() {
+  const std::optional<T> get_min() const {
+    if (root)
+      return find_minimum(root)->data;
+    else
+      return std::nullopt;
+  }
+
+  std::string to_string_summary() const {
     std::stringstream s;
     s << '[';
     s << "Size: " << size << " | ";
-    s << "Height: " << height << " | ";
-    s << "Max value: " << get_max() << " | ";
-    s << "Min value: " << get_min();
+    s << "Height: " << height;
     s << ']';
     return s.str();
   }
