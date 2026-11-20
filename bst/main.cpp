@@ -1,6 +1,9 @@
 #include <bst.hpp>
 #include <cassert>
+#include <chrono>
+#include <cmath>
 #include <print>
+#include <random>
 #include <sstream>
 
 using namespace bst;
@@ -41,7 +44,7 @@ struct TestStruct {
   }
 };
 
-int main(void) {
+void simple_test(void) {
   Bst<int> bst;
   bst.insert(1);
   bst.insert(2);
@@ -103,3 +106,66 @@ int main(void) {
   std::println("Bst of ptr to int: {}",
                bst_ptr.to_string(TraverseOrder::Inorder));
 }
+
+using very_long = unsigned long long;
+using cool_clock = std::chrono::high_resolution_clock;
+using fp_timestamp = std::chrono::duration<float, std::micro>;
+
+void time_test() {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+
+  const int MAX_ORDER = 4;
+  Bst<very_long> bst;
+
+  for (int order = 1; order <= MAX_ORDER; order++) {
+    std::println("====== Current order: {} ======", order);
+    const int N = pow(10, order);
+
+    // add to tree
+    std::println("Insertion");
+    const auto T1_INSERT = cool_clock::now();
+    for (int i = 0; i < N; i++) {
+      bst.insert(gen());
+    }
+    const auto T2_INSERT = cool_clock::now();
+    const auto INSERT_DURATION = fp_timestamp(T2_INSERT - T1_INSERT);
+    const auto AVG_INSERT_DURATION = INSERT_DURATION / N;
+    const auto HEIGHT_TO_ORDER_RATIO = (float)bst.get_height() / N;
+    const auto LOG2_ORDER = std::log2(N);
+    const auto HEIGHT_TO_LOG2 = (float)bst.get_height() / LOG2_ORDER;
+
+    std::println("\tDuration: {}", INSERT_DURATION);
+    std::println("\tAvg duration: {}", AVG_INSERT_DURATION);
+    std::println("\tHeight: {}", bst.get_height());
+    std::println("\tHeight / N: {}", HEIGHT_TO_ORDER_RATIO);
+    std::println("\tLog_2(N): {}", LOG2_ORDER);
+    std::println("\tHeight / log_2(N): {}", HEIGHT_TO_LOG2);
+    std::println("\tTree summary: {}", bst.to_string_summary());
+    std::println();
+
+    // search
+    std::println("Search");
+
+    int hits = 0;
+    const int M = pow(10, 4);
+    const auto T1_SEARCH = cool_clock::now();
+    for (int i = 0; i < M; i++) {
+      auto result = bst.search(gen());
+
+      if (result)
+        hits++;
+    }
+
+    const auto T2_SEARCH = cool_clock::now();
+    const auto SEARCH_DURATION = fp_timestamp(T2_SEARCH - T1_SEARCH);
+    const auto AVG_SEARCH_DURATION = SEARCH_DURATION / M;
+    std::println("\tSearch hits: {}", hits);
+    std::println("\tDuration: {}", SEARCH_DURATION);
+    std::println("\tAvg duration: {}", AVG_SEARCH_DURATION);
+
+    bst.clear();
+  }
+}
+
+int main(void) { time_test(); }
