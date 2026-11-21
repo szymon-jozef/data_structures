@@ -1,8 +1,13 @@
+#pragma once
 #include <algorithm>
+#include <cstddef>
 #include <custom_concepts.hpp>
 #include <optional>
 #include <ostream>
 #include <sstream>
+#include <string>
+#include <type_traits>
+#include <utility>
 
 namespace bst {
 
@@ -12,34 +17,6 @@ template <typename T>
   requires Comparable<T> && Printable<T>
 class Bst {
 
-  template <typename Y>
-    requires Comparable<Y> && Printable<Y>
-  struct Node {
-    T data;
-    Node *parent;
-    Node *left;
-    Node *right;
-    size_t index;
-
-    Node(Y data, size_t index)
-        : data(data), parent(nullptr), left(nullptr), right(nullptr),
-          index(index) {}
-
-    friend std::ostream &operator<<(std::ostream &os, const Node &n) {
-      os << '[' << n.data << "{" << n.index << "}"
-         << "| Parent: " << (n.parent ? "Y" : "N")
-         << "| Left: " << (n.left ? "Y" : "N")
-         << "| Right: " << (n.right ? "Y" : "N") << ']';
-
-      return os;
-    }
-  };
-
-  Node<T> *root = nullptr;
-  size_t size = 0;
-  size_t height = 0;
-  size_t current_node_index = 0;
-
   static const auto &unwrap(const T &data) {
     if constexpr (std::is_pointer_v<T>) {
       return *data;
@@ -48,7 +25,34 @@ class Bst {
     }
   }
 
-  size_t count_height_helper(Node<T> *node, size_t current_height) {
+  static bool lt(const T &a, const T &b) { return unwrap(a) < unwrap(b); }
+
+  struct Node {
+    T data;
+    Node *parent;
+    Node *left;
+    Node *right;
+    size_t index;
+
+    Node(T data, size_t index)
+        : data(std::move(data)), parent(nullptr), left(nullptr), right(nullptr),
+          index(index) {}
+
+    friend std::ostream &operator<<(std::ostream &os, const Node &n) {
+      os << '[' << unwrap(n.data) << "{" << n.index << "}"
+         << "| Parent: " << (n.parent ? "Y" : "N")
+         << "| Left: " << (n.left ? "Y" : "N")
+         << "| Right: " << (n.right ? "Y" : "N") << ']';
+
+      return os;
+    }
+  };
+
+  Node *root = nullptr;
+  size_t size = 0;
+  size_t current_node_index = 0;
+
+  size_t count_height_helper(Node *node, size_t current_height) const {
     if (!node)
       return 0;
 
@@ -57,51 +61,45 @@ class Bst {
     return std::max(std::max(h_left, h_right), current_height);
   }
 
-  size_t count_height() {
+  size_t count_height() const {
     if (!root)
       return 0;
 
     return count_height_helper(root, 0);
   }
 
-  bool insert_helper(Node<T> *node, const T &data) {
-    T node_data = node->data;
+  bool insert_helper(Node *node, const T &data) {
+    const T node_data = node->data;
 
-    if (node_data == data) {
-      return false;
-    }
-
-    if (data < node_data) {
+    if (lt(data, node_data)) {
       if (node->left) {
         return insert_helper(node->left, data);
       }
 
-      Node<T> *new_node = new Node(data, current_node_index++);
+      Node *new_node = new Node(data, current_node_index++);
       new_node->parent = node;
       node->left = new_node;
       size++;
-      height = count_height();
       return true;
     }
 
-    if (data > node_data) {
+    if (lt(node_data, data)) {
       if (node->right) {
         return insert_helper(node->right, data);
       }
 
-      Node<T> *new_node = new Node(data, current_node_index++);
+      Node *new_node = new Node(data, current_node_index++);
       new_node->parent = node;
       node->right = new_node;
       size++;
-      height = count_height();
       return true;
     }
 
     return false;
   }
 
-  void to_string_helper(Node<T> *node, std::stringstream &s,
-                        const TraverseOrder &order) {
+  void to_string_helper(Node *node, std::stringstream &s,
+                        const TraverseOrder &order) const {
     switch (order) {
     case TraverseOrder::Preorder:
       if (!node) {
@@ -139,28 +137,24 @@ class Bst {
     }
   }
 
-  Node<T> *search_helper(Node<T> *node, const T &data) const {
+  Node *search_helper(Node *node, const T &data) const {
     if (!node) {
       return nullptr;
     }
 
-    if (node->data == data) {
-      return node;
-    }
-
-    if (node->data < data) {
+    if (lt(node->data, data)) {
       return search_helper(node->right, data);
     }
 
-    if (node->data > data) {
+    if (lt(data, node->data)) {
       return search_helper(node->left, data);
     }
 
-    return nullptr;
+    return node;
   }
 
   /// @brief Replaces one subtree as a child of its parent with another subtree
-  void transplant(Node<T> *to_replace, Node<T> *replacement) {
+  void transplant(Node *to_replace, Node *replacement) {
     if (to_replace == root) {
       root = replacement;
     } else if (to_replace == to_replace->parent->left) {
@@ -174,19 +168,19 @@ class Bst {
     }
   }
 
-  static Node<T> *find_minimum(Node<T> *root) {
-    if (root->left == nullptr) {
-      return root;
+  static Node *find_minimum(Node *node) {
+    if (node->left == nullptr) {
+      return node;
     } else {
-      return find_minimum(root->left);
+      return find_minimum(node->left);
     }
   }
 
-  static Node<T> *find_maximum(Node<T> *root) {
-    if (root->right == nullptr) {
-      return root;
+  static Node *find_maximum(Node *node) {
+    if (node->right == nullptr) {
+      return node;
     } else {
-      return find_maximum(root->right);
+      return find_maximum(node->right);
     }
   }
 
@@ -194,7 +188,7 @@ public:
   Bst() = default;
 
   Bst(const Bst &bst) = delete;
-  Bst operator=(const Bst &bst) = delete;
+  Bst &operator=(const Bst &bst) = delete;
 
   ~Bst() { clear(); }
 
@@ -202,10 +196,9 @@ public:
   /// @return `true` on success, `false` if `data` is a duplicate
   bool insert(const T &data) {
     if (is_empty()) {
-      Node<T> *new_node = new Node(data, current_node_index++);
+      Node *new_node = new Node(data, current_node_index++);
       root = new_node;
       size++;
-      height = 0;
       return true;
     }
 
@@ -214,10 +207,10 @@ public:
 
   /// @brief Search for a node with `data`
   /// @return Pointer to node containing `data`
-  Node<T> *search(const T &data) const { return search_helper(root, data); }
+  Node *search(const T &data) const { return search_helper(root, data); }
 
   /// @brief Remove given node
-  void remove(Node<T> *node) {
+  void remove(Node *node) {
     if (!node) { // nothing to remove
       return;
     }
@@ -226,18 +219,16 @@ public:
     if (node->left == nullptr) {
       transplant(node, node->right);
       delete node;
-      height = count_height();
       size--;
       return;
     } else if (node->right ==
                nullptr) { // second case -> node has only left child
       transplant(node, node->left);
       delete node;
-      height = count_height();
       size--;
       return;
     } else { // third case -> node has two children
-      Node<T> *min = find_minimum(node->right);
+      Node *min = find_minimum(node->right);
       if (min->parent != node) {
         transplant(min, min->right);
         min->right = node->right;
@@ -248,7 +239,6 @@ public:
       min->left = node->left;
       min->left->parent = min;
       delete node;
-      height = count_height();
       size--;
     }
   }
@@ -258,16 +248,18 @@ public:
     while (root) {
       remove(root);
     }
+    current_node_index = 0;
+    size = 0;
   }
 
-  bool is_empty() { return !root; }
+  bool is_empty() const { return !root; }
 
   /// @brief Return the tree height
-  size_t get_height() const { return height; }
+  size_t get_height() const { return count_height(); }
   /// @brief Return the tree size (amount of nodes)
   size_t get_size() const { return size; }
 
-  std::string to_string(const TraverseOrder &traverse_order) {
+  std::string to_string(const TraverseOrder &traverse_order) const {
     std::stringstream s;
     s << '[';
     to_string_helper(root, s, traverse_order);
@@ -275,14 +267,14 @@ public:
     return s.str();
   }
 
-  const std::optional<T> get_max() const {
+  std::optional<T> get_max() const {
     if (root)
       return find_maximum(root)->data;
     else
       return std::nullopt;
   }
 
-  const std::optional<T> get_min() const {
+  std::optional<T> get_min() const {
     if (root)
       return find_minimum(root)->data;
     else
@@ -293,7 +285,7 @@ public:
     std::stringstream s;
     s << '[';
     s << "Size: " << size << " | ";
-    s << "Height: " << height;
+    s << "Height: " << get_height();
     s << ']';
     return s.str();
   }

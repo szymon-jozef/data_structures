@@ -115,7 +115,7 @@ void time_test() {
   std::random_device rd;
   std::mt19937 gen(rd());
 
-  const int MAX_ORDER = 4;
+  const int MAX_ORDER = 7;
   Bst<very_long> bst;
 
   for (int order = 1; order <= MAX_ORDER; order++) {
@@ -168,4 +168,7 @@ void time_test() {
   }
 }
 
-int main(void) { time_test(); }
+int main(void) {
+  // simple_test();
+  time_test();
+}
