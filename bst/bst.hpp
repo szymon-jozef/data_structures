@@ -227,13 +227,13 @@ public:
     // first case -> node has only right child
     if (node->left == nullptr) {
       transplant(node, node->right);
-      remove_node(node);
+      remove_node(node, free_memory);
       size--;
       return;
     } else if (node->right ==
                nullptr) { // second case -> node has only left child
       transplant(node, node->left);
-      remove_node(node);
+      remove_node(node, free_memory);
       size--;
       return;
     } else { // third case -> node has two children
@@ -248,7 +248,7 @@ public:
       min->left = node->left;
       min->left->parent = min;
 
-      remove_node(node);
+      remove_node(node, free_memory);
       size--;
     }
   }
