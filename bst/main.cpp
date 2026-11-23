@@ -105,6 +105,7 @@ void simple_test(void) {
   bst_ptr.insert(new int(1));
   std::println("Bst of ptr to int: {}",
                bst_ptr.to_string(TraverseOrder::Inorder));
+  bst_ptr.clear(true);
 }
 
 using very_long = unsigned long long;
@@ -169,6 +170,6 @@ void time_test() {
 }
 
 int main(void) {
-  // simple_test();
-  time_test();
+  simple_test();
+  // time_test();
 }

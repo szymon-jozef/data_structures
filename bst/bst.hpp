@@ -184,6 +184,15 @@ class Bst {
     }
   }
 
+  void remove_node(Node *node, bool should_free = false) {
+    if constexpr (std::is_pointer_v<T>) {
+      if (should_free) {
+        delete node->data;
+      }
+    }
+    delete node;
+  }
+
 public:
   Bst() = default;
 
@@ -210,7 +219,7 @@ public:
   Node *search(const T &data) const { return search_helper(root, data); }
 
   /// @brief Remove given node
-  void remove(Node *node) {
+  void remove(Node *node, bool free_memory = false) {
     if (!node) { // nothing to remove
       return;
     }
@@ -218,13 +227,13 @@ public:
     // first case -> node has only right child
     if (node->left == nullptr) {
       transplant(node, node->right);
-      delete node;
+      remove_node(node);
       size--;
       return;
     } else if (node->right ==
                nullptr) { // second case -> node has only left child
       transplant(node, node->left);
-      delete node;
+      remove_node(node);
       size--;
       return;
     } else { // third case -> node has two children
@@ -238,15 +247,16 @@ public:
       transplant(node, min);
       min->left = node->left;
       min->left->parent = min;
-      delete node;
+
+      remove_node(node);
       size--;
     }
   }
 
   /// @brief Remove every node from the tree
-  void clear() {
+  void clear(bool free_memory = false) {
     while (root) {
-      remove(root);
+      remove(root, free_memory);
     }
     current_node_index = 0;
     size = 0;
