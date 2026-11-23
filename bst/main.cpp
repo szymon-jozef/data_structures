@@ -2,9 +2,11 @@
 #include <cassert>
 #include <chrono>
 #include <cmath>
+#include <cstring>
 #include <print>
 #include <random>
 #include <sstream>
+#include <string>
 
 using namespace bst;
 
@@ -169,7 +171,18 @@ void time_test() {
   }
 }
 
-int main(void) {
-  simple_test();
-  // time_test();
+int main(int argc, char **argv) {
+  if (argc != 2) {
+    std::println("Invalid arg amount");
+    exit(1);
+  }
+
+  if (std::string(argv[1]) == "simple") {
+    simple_test();
+  } else if (std::string(argv[1]) == "time") {
+    time_test();
+  } else {
+    std::println("Unrecognized command!");
+    exit(1);
+  }
 }
